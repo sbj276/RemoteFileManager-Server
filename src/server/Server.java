@@ -29,6 +29,11 @@ public class Server {
         try {
             members=new Vector();
             sco=new ServerSocket(Constants.SOCKET);
+             java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    new ConfigWindow().setVisible(true);
+                }
+            });
             while(true){
                 Socket so=sco.accept();
                 Instance ins=new Instance(so);
@@ -41,11 +46,7 @@ public class Server {
     
     public static void main(String[] args) {
         // TODO code application logic here
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ConfigWindow().setVisible(true);
-            }
-        });
+       
         new Server();
         
     }

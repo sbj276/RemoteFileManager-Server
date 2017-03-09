@@ -5,20 +5,39 @@
  */
 package server;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Iterator;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import values.Constants;
 
 /**
  *
  * @author Vinay
  */
-public class ConfigWindow extends javax.swing.JFrame {
+public class ConfigWindow extends javax.swing.JFrame implements Runnable {
 
     /**
      * Creates new form ConfigWindow
      */
+    DefaultListModel model;
     public ConfigWindow() {
         initComponents();
+        InetAddress IP;
+        try {
+            IP = InetAddress.getLocalHost();
+            ip.setText(IP.getHostAddress());
+        } catch (UnknownHostException ex) {
+            ip.setText("UnKnown IP Address. check Adapter Settings");
+        }
+//        pass.setText(Constants.PASSWORD);
+        jList1.setModel(new DefaultListModel<>());
+        model=(DefaultListModel)jList1.getModel();
+        new Thread(this).start();
     }
 
     /**
@@ -31,7 +50,7 @@ public class ConfigWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        ip = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         pass = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -42,11 +61,10 @@ public class ConfigWindow extends javax.swing.JFrame {
 
         jLabel1.setText("IP");
 
-        jLabel2.setText("jLabel2");
+        ip.setText("jLabel2");
 
         jLabel3.setText("Password");
 
-        pass.setText("jTextField1");
         pass.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 passKeyReleased(evt);
@@ -78,8 +96,8 @@ public class ConfigWindow extends javax.swing.JFrame {
                                 .addComponent(jLabel3))
                             .addGap(48, 48, 48)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(pass, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)))))
+                                .addComponent(ip, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                                .addComponent(pass)))))
                 .addContainerGap(39, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -88,7 +106,7 @@ public class ConfigWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2))
+                    .addComponent(ip))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -140,12 +158,32 @@ public class ConfigWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel ip;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField pass;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void run() {
+       while(true){
+           synchronized (Server.members) {
+                
+               try {
+                   Iterator<String> it=Server.members.iterator();
+                   model.clear();
+                   while(it.hasNext()){
+                       model.addElement(it.next());
+                       
+                   }
+                   Server.members.wait();
+               } catch (InterruptedException ex) {
+                   System.out.println("Error");
+               }
+            }
+        }   
+   }
 }

@@ -10,6 +10,6 @@ package values;
  * @author Vinay
  */
 public  class Constants {
-   static public String PASSWORD="4578";
+   static public String PASSWORD="12345";
    static public int SOCKET=1947; 
 }

@@ -45,7 +45,12 @@ public class Instance extends Thread{
             }
             out.writeUTF("0:Password Accpted");
             logName=temp[0];
-            Server.members.add(logName);
+            
+            synchronized (Server.members) {
+                Server.members.add(logName);
+                Server.members.notify();
+            }
+            
             System.out.println(logName+"  connected");
             start();
         } catch (IOException ex) {
@@ -65,7 +70,10 @@ public class Instance extends Thread{
                     request=in.readUTF();
                 } catch (IOException ex) {
                     System.out.println(logName+" disconnected");
-                    Server.members.remove(logName);
+                    synchronized(Server.members){
+                        Server.members.remove(logName);
+                        Server.members.notify();
+                    }
                     this.stop();
                 }
                 System.out.println(logName+" asking for "+request);
